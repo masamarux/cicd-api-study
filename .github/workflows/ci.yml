@@ -1,9 +1,14 @@
 name: CI
 
+on:
+  push:
+    branches:
+      - master
+
 jobs:
   build:
     name: 'Build and Push'
-    runner: 'ubuntu-latest'
+    runs-on: 'ubuntu-latest'
 
     steps:
     - uses: actions/checkout@v4
