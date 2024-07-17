@@ -1,0 +1,9 @@
+name: CI
+
+jobs:
+  build:
+    name: 'Build and Push'
+    runner: 'ubuntu-latest'
+
+    steps:
+    - uses: actions/checkout@v4
