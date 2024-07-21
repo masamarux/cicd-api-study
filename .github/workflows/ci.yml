@@ -13,18 +13,13 @@ jobs:
   build:
     name: 'Build and Push'
     runs-on: 'ubuntu-latest'
-    # strategy:
-    #   matrix:
-    #     node: [16, 18, 20]
 
     steps:
     - uses: actions/checkout@v4
 
-    # - name: Setup node | ${{ matrix.node }}
     - name: Setup node
       uses: actions/setup-node@v4
       with:
-        # node-version: ${{ matrix.node }}
         node-version: '18'
         cache: 'npm'
     - run: npm install
@@ -46,20 +41,13 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
 
-    # - name: Login into container registry
-    #   uses: docker/login-action@v3
-    #   with:
-    #     username: ${{ secrets.DOCKERHUB_USERNAME }}
-    #     password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-    # - name: Build and push
-    #   uses: docker/build-push-action@v6
-    #   with:
-    #     push: true
-    #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/masa-api:${{ steps.generate_tag.outputs.sha }},${{ secrets.DOCKERHUB_USERNAME }}/masa-api:latest
-
-    # - name: Build docker image
-    #   run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/masa-api:${{ steps.generate_tag.outputs.sha }} .
+    - name: Build docker image
+      env:
+        REGISTRY: ${{steps.login-ecr.outputs.registry}}
+        TAG: ${{ steps.generate_tag.outputs.sha }}
+      run: |
+        docker build -t $REGISTRY/masa-ci:$TAG .
+        docker push $REGISTRY/masa-ci:$TAG
 
     # - name: Push image
     #   run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/masa-api:${{ steps.generate_tag.outputs.sha }}
