@@ -42,12 +42,28 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v2
 
     - name: Build docker image
+      id: build-docker-image
       env:
         REGISTRY: ${{steps.login-ecr.outputs.registry}}
         TAG: ${{ steps.generate_tag.outputs.sha }}
       run: |
         docker build -t $REGISTRY/masa-ci:$TAG .
         docker push $REGISTRY/masa-ci:$TAG
+        IMAGE=$(echo $REGISTRY/masa-ci:$TAG)
+        echo "image=${IMAGE}" >> $GITHUB_OUTPUT
+
+    - name: Deploy
+      env:
+        IMAGE: ${{ steps.build-docker-image.outputs.IMAGE }}
+      uses: awslabs/amazon-app-runner-deploy@main
+      with:
+        service: masa-api
+        access-role-arn: arn:aws:iam::961957158866:role/app-runner-role
+        region: us-east-2
+        cpu: 1
+        memory: 1
+        port: 3000
+        image: $IMAGE
 
     # - name: Push image
     #   run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/masa-api:${{ steps.generate_tag.outputs.sha }}
