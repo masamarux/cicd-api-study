@@ -54,7 +54,7 @@ jobs:
 
     - name: Deploy
       env:
-        IMAGE: ${{ steps.build-docker-image.outputs.IMAGE }}
+        IMAGE: ${{ steps.build-docker-image.outputs.image }}
       uses: awslabs/amazon-app-runner-deploy@main
       with:
         service: masa-api
